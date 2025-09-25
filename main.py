@@ -1,66 +1,67 @@
 import requests
 
-# la liste des ville
+# la liste des villes avec leur coordonner
 villes = {
     "Nanterre": [48.89, 2.20],
-    "Paris": [48.8566, 2.3522],  
+    "Paris": [48.8566, 2.3522],
 }
 
 def recuperer_meteo(latitude, longitude):
-    # on utilise API pour savoir la temperature de la ville avec latude et la longitude
+    # on utilise API pour récupérer la meteo actuelle avec la latitude et la longitude
     url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
     
-    # il va envoyer une requests
     response = requests.get(url)
 
-    # pour avoir une reponse de API si on resoin il donne la reponse il passe a if si non sa passe vers else pour qui affiche erreur
     if response.status_code == 200:
-        donnees = response.json()  
-        temperature = donnees["current_weather"]["temperature"]  # on va prendre la temprature dans la liste 
-        return temperature
+        donnees = response.json() 
+        temperature = donnees['current_weather']['temperature']  # recuperation de la temperature
+        vent = donnees['current_weather']['windspeed']  # recuperation de la vitesse du vent
+        return temperature, vent
     else:
-        # si la requete sa marche 
+         # la réponse de API a une erreur
         print("Erreur...")
-        return None
-    
- # while sa saire a faire une boucle avec des condition si la personne ne fait pas 3 
+        return None, None
+
+# while permet de creer un menu  
 while True:
-    #  le menu
-    print("1 - Choisir une ville dans la liste")
-    print("2 - Entrer une ville manuellement avec coordonnées")
-    print("3 - Quitter")
-
-    # on va demander le choix à l utilisateur
-    choix = input("Votre choix : ")
-     # option 1 : donne la liste des ville et utilisateur peut choisir la ville avec des chiffre 
+    # le menu
+    print("\nMenu Météo:")
+    print("1. Météo à Nanterre")
+    print("2. Ajouter une ville et voir sa météo")
+    print("3. Afficher météo pour toutes les villes")
+    print("4. Quitter")
+    
+    choix = input("Votre choix: ")
+    
     if choix == "1":
-        for i, ville in enumerate(villes, 1):
-            print(f"{i} - {ville}") # donne un numerro avec la ville 
-        num = input("Choisissez une ville (numéro) : ")
-        if num.isdigit() and 1 <= int(num) <= len(villes): # verifie si le numero est dans la liste 
-            ville = list(villes)[int(num)-1] # choisie la ville avec le nimero 
-            temp = recuperer_meteo(*villes[ville])  # va recuperer la temperature de la ville 
-            if temp is not None:
-                print(f"{ville} : {temp}°C") # affiche la ville avec sa temperature 
-        else:
-            print("Erreur merci de mettre un chiffre de la liste")
-
-    # option 2 : donner le nom de la ville et les cordonner 
+        # on recupere les coordonner de Nanterre
+        coords = villes["Nanterre"]
+        # on recupere la temperature et le vent
+        temp, vent = recuperer_meteo(coords[0], coords[1])
+        print(f"meteo à Nanterre : temperature {temp}°C, vent {vent} km/h")
+        
     elif choix == "2":
-        ville = input("Entrez le nom de la ville : ")
-        lat = input("Entrez la latitude : ")
-        lon = input("Entrez la longitude : ")
-        try:
-            lat = float(lat)  # latitude 
-            lon = float(lon)  # longitude
-            temperature = recuperer_meteo(lat, lon)  # on recupere la temperature
-            if temperature is not None:
-                print(f"La température actuelle à {ville} est de {temperature}°C")
-        except ValueError:
-            # si c est pas des nombre sa mais erreur
-            print("erreur merci de mettre des nombre correcte")
-
-    # option 3 : on stop le script
+        # on demande le nom et les coordonnées de la nouvelle ville
+        nom = input("Nom de la ville: ")
+        lat = float(input("Latitude: "))
+        lon = float(input("Longitude: "))
+        # on ajoute la ville à notre liste
+        villes[nom] = [lat, lon]
+        # on récupère la météo pour cette ville
+        temp, vent = recuperer_meteo(lat, lon)
+        print(f"meteo à {nom} : temperature {temp}°C, vent {vent} km/h")
+        
     elif choix == "3":
+        # on parcourt toutes les ville et on affiche leur meteo
+        for ville, coords in villes.items():
+            temp, vent = recuperer_meteo(coords[0], coords[1])
+            print(f"{ville} : temperature {temp}°C, vent {vent} km/h")
+            
+    elif choix == "4":
+        # stop le script
         print("Bye")
-        break 
+        break
+        
+    else:
+        # Si l'utilisateur entre un choix invalide
+        print("merci de mettre un vrai choix")
