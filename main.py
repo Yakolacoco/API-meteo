@@ -32,25 +32,18 @@ while True:
 
     # on va demander le choix à l utilisateur
     choix = input("Votre choix : ")
-
-    # option 1  choisir une ville dans la liste
+     # option 1 : donne la liste des ville et utilisateur peut choisir la ville avec des chiffre 
     if choix == "1":
-        print("\nVilles disponibles :")
-        # on affiche toutes les villes avec un numéro
-        for i, ville in enumerate(villes.keys(), start=1):
-            print(f"{i} - {ville}")
-
-        # on demande le numero pour qui choisiela ville qui veut
+        for i, ville in enumerate(villes, 1):
+            print(f"{i} - {ville}") # donne un numerro avec la ville 
         num = input("Choisissez une ville (numéro) : ")
-        if num.isdigit() and 1 <= int(num) <= len(villes):
-            # on recupere le nom de la ville
-            ville = list(villes.keys())[int(num) - 1]
-            lat, lon = villes[ville]  # On récupère les coordonnées
-            temperature = recuperer_meteo(lat, lon)  # On récupère la température grace latidude et longitude
-            if temperature is not None:
-                print(f"La température actuelle à {ville} est de {temperature}°C") #afficge le nom de la ville que on na mi avec la temperature 
+        if num.isdigit() and 1 <= int(num) <= len(villes): # verifie si le numero est dans la liste 
+            ville = list(villes)[int(num)-1] # choisie la ville avec le nimero 
+            temp = recuperer_meteo(*villes[ville])  # va recuperer la temperature de la ville 
+            if temp is not None:
+                print(f"{ville} : {temp}°C") # affiche la ville avec sa temperature 
         else:
-            print("Numéro invalide.")
+            print("Erreur merci de mettre un chiffre de la liste")
 
     # option 2 : donner le nom de la ville et les cordonner 
     elif choix == "2":
